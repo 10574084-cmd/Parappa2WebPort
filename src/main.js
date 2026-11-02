@@ -70,6 +70,7 @@ function finishSession() {
 }
 function resetSession() {
   audio.pause();
+  if (selectedFile) audio.audio.currentTime = 0;
   session?.stop();
   session = null;
   finished = false;
@@ -107,9 +108,11 @@ async function startSession() {
     if (!selectedFile) { startDemo(); return; }
     const config = settings();
     currentTrackDuration = audio.duration || 24;
+    audio.audio.currentTime = 0;
     chart = makeSongChart(config.bpm, currentTrackDuration, config.offset);
     createSession(chart);
     await audio.play();
+    if (!session.active) { finishSession(); return; }
     $('startButton').disabled = true;
     $('stopButton').disabled = false;
     showStatus('TRACK PLAYING');

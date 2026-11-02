@@ -67,7 +67,7 @@ export class StageRenderer {
     gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer);
     gl.bufferData(gl.ARRAY_BUFFER, CUBE, gl.STATIC_DRAW);
     gl.enable(gl.DEPTH_TEST);
-    gl.enable(gl.CULL_FACE);
+    gl.disable(gl.CULL_FACE);
     gl.clearColor(0.055, 0.065, 0.13, 1);
     this.start = performance.now();
   }
