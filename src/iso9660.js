@@ -60,8 +60,8 @@ export class Iso9660Image {
     if (primary === null) throw new Error('No se encontró el descriptor primario ISO 9660 (CD001).');
 
     const pvd = new DataView(this.buffer, primary, SECTOR_SIZE);
-    this.systemId = new TextDecoder('ascii').decode(new Uint8Array(this.buffer, primary + 8, 32)).trim();
-    this.volumeId = new TextDecoder('ascii').decode(new Uint8Array(this.buffer, primary + 40, 32)).trim();
+    this.systemId = new TextDecoder('ascii').decode(new Uint8Array(this.buffer, primary + 8, 32)).replace(/\0+$/g, '').trim();
+    this.volumeId = new TextDecoder('ascii').decode(new Uint8Array(this.buffer, primary + 40, 32)).replace(/\0+$/g, '').trim();
     const littleBlock = pvd.getUint16(128, true);
     const bigBlock = pvd.getUint16(130, false);
     if (littleBlock !== bigBlock || littleBlock < 512 || littleBlock > 4096 || (littleBlock & (littleBlock - 1)) !== 0) {
