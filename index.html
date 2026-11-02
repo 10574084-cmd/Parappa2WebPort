@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#111327">
+  <title>Rhythm Port Lab — Web Engine Prototype</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="shell">
+    <header class="topbar">
+      <div><p class="eyebrow">WEB PORT FOUNDATION · BUILD 0.2</p><h1>RHYTHM <span>PORT LAB</span></h1></div>
+      <div class="status"><i id="statusDot"></i><span id="statusText">ENGINE READY</span></div>
+    </header>
+    <section class="stage-wrap" aria-label="Escenario 3D original">
+      <canvas id="stage" aria-label="Escenario 3D"></canvas>
+      <div class="stage-overlay top-left"><span class="chip">WEBGL2</span><span class="chip">AUDIO CLOCK</span></div>
+      <div class="stage-overlay top-right"><span id="bpmLabel">96 BPM</span></div>
+      <div class="stage-caption"><b>RHYTHM ENGINE</b><span>Original placeholder scene · No game assets included</span></div>
+      <div id="webglFallback" class="fallback hidden">WebGL2 no está disponible en este navegador.</div>
+    </section>
+    <section class="deck">
+      <div class="deck-head">
+        <div><p class="eyebrow">PLAYTEST</p><h2>Beat session</h2></div>
+        <div class="scoreboard">
+          <div><small>SCORE</small><b id="score">000000</b></div>
+          <div><small>COMBO</small><b id="combo">0</b></div>
+          <div><small>JUDGEMENT</small><b id="judgement">READY</b></div>
+        </div>
+      </div>
+      <div class="lanes" id="lanes" aria-label="Pistas de ritmo">
+        <div class="lane" data-lane="0"><span class="lane-key">J</span><div class="note-track"></div><span class="hit-line"></span></div>
+        <div class="lane" data-lane="1"><span class="lane-key">K</span><div class="note-track"></div><span class="hit-line"></span></div>
+        <div class="lane" data-lane="2"><span class="lane-key">L</span><div class="note-track"></div><span class="hit-line"></span></div>
+      </div>
+      <div class="controls-row">
+        <label class="file-button" for="trackFile">LOAD YOUR AUDIO</label>
+        <input id="trackFile" type="file" accept="audio/*">
+        <div class="track-name" id="trackName">Built-in timing chart · 96 BPM</div>
+        <label class="setting">BPM <input id="bpmInput" type="number" min="60" max="220" step="1" value="96"></label>
+        <label class="setting">OFFSET <input id="offsetInput" type="number" min="-500" max="500" step="5" value="0"> ms</label>
+        <button id="startButton" class="primary">START TEST</button>
+        <button id="stopButton" class="secondary" disabled>STOP</button>
+      </div>
+      <div class="transport"><div class="progress"><i id="progressBar"></i></div><span id="timeLabel">00:00 / 00:00</span></div>
+      <p class="hint">Teclado: J / K / L · Mando: ✕ / ○ / □ · También puedes tocar las pistas.</p>
+    </section>
+    <footer><span>Prototype for a future browser-native rhythm port.</span><span>Local audio stays in your browser.</span></footer>
+  </main>
+  <audio id="audio" preload="metadata"></audio>
+  <script type="module" src="src/main.js"></script>
+</body>
+</html>
