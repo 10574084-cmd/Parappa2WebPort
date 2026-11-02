@@ -34,3 +34,8 @@ The workflow in .github/workflows/pages.yml deploys the repository root to GitHu
 5. Implement PaRappa 2-specific adapters only after obtaining the necessary permissions and authorized data.
 
 A full port requires substantial reverse engineering and technical work. This prototype uses generated test charts; it does not read PS2 disc images or parse game-specific files. The original parappadev/parappa2 repository remains untouched and its code is not copied here.
+
+
+## Local ISO 9660 inspector (build 0.3 in progress)
+
+The browser includes a read-only ISO 9660 directory inspector for a user-selected local image. It lists folders/files and previews up to 32 bytes of a selected file as hex. The image is processed in the page and is never uploaded, extracted into the repository, decrypted, or executed. This is a generic container reader, not a PaRappa 2-specific asset parser.

@@ -20,6 +20,19 @@
       <div class="stage-caption"><b>RHYTHM ENGINE</b><span>Original placeholder scene · No game assets included</span></div>
       <div id="webglFallback" class="fallback hidden">WebGL2 no está disponible en este navegador.</div>
     </section>
+    <section class="inspect-panel">
+      <div class="inspect-heading">
+        <div><p class="eyebrow">LOCAL DISC INSPECTOR</p><h2>PS2 IMAGE CONTENTS</h2></div>
+        <label class="file-button" for="discFile">LOAD ISO IMAGE</label>
+        <input id="discFile" type="file" accept=".iso,.bin,.img,application/octet-stream">
+      </div>
+      <p class="inspect-note">ISO 9660 directory browser · The image is read locally in your browser and is never uploaded.</p>
+      <div id="discStatus" class="disc-status">No image loaded. Select a local ISO to inspect its directory tree.</div>
+      <div id="discSummary" class="disc-summary"></div>
+      <input id="discSearch" class="disc-search" type="search" placeholder="Filter paths or file extensions..." disabled>
+      <div id="discFiles" class="iso-list" aria-live="polite"><div class="empty-list">Waiting for a disc image.</div></div>
+      <div class="header-panel"><div class="header-title">FILE HEADER PREVIEW <span>32 bytes · HEX ONLY</span></div><pre id="fileHeader">Select a file entry to inspect its first bytes.</pre></div>
+    </section>
     <section class="deck">
       <div class="deck-head">
         <div><p class="eyebrow">PLAYTEST</p><h2>Beat session</h2></div>

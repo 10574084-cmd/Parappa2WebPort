@@ -1,6 +1,7 @@
 import { AudioClock } from './audio.js';
 import { DEMO_BPM, makeDemoChart, makeSongChart, RhythmSession, laneForKey, NOTE_TRAVEL } from './rhythm.js';
 import { StageRenderer } from './renderer.js';
+import { Iso9660Image, formatBytes } from './iso9660.js';
 
 const $ = id => document.getElementById(id);
 const audio = new AudioClock($('audio'));
@@ -179,4 +180,97 @@ function frame(now) {
   requestAnimationFrame(frame);
 }
 requestAnimationFrame(frame);
+
+// ISO 9660 inspector: selected images stay local to this browser tab.
+let loadedIso = null;
+let visibleIsoEntries = [];
+const discFileInput = $('discFile');
+const discSearchInput = $('discSearch');
+
+function setDiscStatus(message, isError = false) {
+  $('discStatus').textContent = message;
+  $('discStatus').classList.toggle('error', isError);
+}
+function showFileHeader(entry) {
+  try {
+    const bytes = loadedIso.readHeader(entry, 32);
+    const hex = Array.from(bytes, value => value.toString(16).padStart(2, '0').toUpperCase()).join(' ');
+    const ascii = Array.from(bytes, value => value >= 32 && value <= 126 ? String.fromCharCode(value) : '.').join('');
+    $('fileHeader').textContent = hex + '\n\n' + ascii;
+  } catch (error) {
+    $('fileHeader').textContent = error.message;
+  }
+}
+function renderIsoEntries() {
+  const query = discSearchInput.value.trim().toLowerCase();
+  visibleIsoEntries = loadedIso.entries.filter(entry =>
+    !query || entry.path.toLowerCase().includes(query)
+  ).slice(0, 500);
+  const container = $('discFiles');
+  container.replaceChildren();
+  if (!visibleIsoEntries.length) {
+    const empty = document.createElement('div');
+    empty.className = 'empty-list';
+    empty.textContent = 'No matching entries.';
+    container.append(empty);
+    return;
+  }
+  for (const entry of visibleIsoEntries) {
+    const row = document.createElement('button');
+    row.type = 'button';
+    row.className = 'iso-row';
+    const glyph = document.createElement('span');
+    glyph.className = 'iso-glyph';
+    glyph.textContent = entry.directory ? 'DIR' : 'FILE';
+    const path = document.createElement('span');
+    path.className = 'iso-path';
+    path.textContent = entry.path;
+    const size = document.createElement('span');
+    size.className = 'iso-size';
+    size.textContent = entry.directory ? 'FOLDER' : formatBytes(entry.size);
+    row.append(glyph, path, size);
+    if (!entry.directory) row.addEventListener('click', () => showFileHeader(entry));
+    else row.disabled = true;
+    container.append(row);
+  }
+  if (loadedIso.entries.length > visibleIsoEntries.length) {
+    const note = document.createElement('div');
+    note.className = 'empty-list';
+    note.textContent = 'Showing ' + visibleIsoEntries.length + ' of ' + loadedIso.entries.length + ' entries. Use the filter to narrow the list.';
+    container.append(note);
+  }
+}
+discFileInput.addEventListener('change', async event => {
+  const file = event.target.files?.[0];
+  if (!file) return;
+  resetSession();
+  loadedIso = null;
+  $('discSummary').replaceChildren();
+  $('fileHeader').textContent = 'Select a file entry to inspect its first bytes.';
+  setDiscStatus('Reading ' + file.name + ' locally…');
+  try {
+    const buffer = await file.arrayBuffer();
+    loadedIso = new Iso9660Image(buffer);
+    const summary = loadedIso.summary();
+    $('discSearch').disabled = false;
+    discSearchInput.value = '';
+    $('discSummary').textContent =
+      'VOLUME: ' + (summary.volumeId || 'UNKNOWN') +
+      ' · BLOCK: ' + summary.sectorSize + ' B' +
+      ' · FILES: ' + summary.files +
+      ' · FOLDERS: ' + summary.directories +
+      ' · DATA: ' + formatBytes(summary.bytes);
+    setDiscStatus('Image indexed locally: ' + file.name + ' (' + formatBytes(file.size) + '). No files were extracted.');
+    renderIsoEntries();
+  } catch (error) {
+    loadedIso = null;
+    $('discSearch').disabled = true;
+    $('discFiles').replaceChildren();
+    setDiscStatus(error.message, true);
+  }
+});
+discSearchInput.addEventListener('input', () => {
+  if (loadedIso) renderIsoEntries();
+});
+
 window.addEventListener('beforeunload', () => audio.dispose());
